@@ -30,3 +30,27 @@ def test_coordinates_returns_location() -> None:
         "latitude": 33.75,
         "longitude": -84.39,
     }
+
+
+def test_weather_returns_forecast() -> None:
+    """The weather endpoint returns the upstream forecast."""
+    forecast = {
+        "current": {"temperature_2m": 78.0, "weather_code": 1},
+        "daily": {"time": ["2026-08-19"], "temperature_2m_max": [85.0]},
+    }
+    with patch("web_app.main.requests.get") as get:
+        get.return_value.json.return_value = forecast
+        response = client.post(
+            "/weather", json={"latitude": 33.75, "longitude": -84.39}
+        )
+
+    assert response.status_code == 200
+    assert response.json() == forecast
+    get.return_value.raise_for_status.assert_called_once_with()
+
+
+def test_weather_rejects_invalid_coordinates() -> None:
+    """The weather endpoint validates coordinate ranges."""
+    response = client.post("/weather", json={"latitude": 91, "longitude": 0})
+
+    assert response.status_code == 422

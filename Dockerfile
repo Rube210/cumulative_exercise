@@ -1,13 +1,13 @@
-FROM python:3.14.6
+FROM python
 
-WORKDIR /web_app
+WORKDIR /app
 
 
-COPY web_app/requirements.txt
+COPY requirement.txt ./
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirement.txt
 
-COPY web_app/
+COPY . ./
 
 EXPOSE 8000
 
